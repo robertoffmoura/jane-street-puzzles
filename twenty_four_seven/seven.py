@@ -22,8 +22,6 @@ bottom_column_count = [0 for i in range(12)]
 top_most_stack = [[12] for i in range(12)]
 left_most_stack = [[12] for i in range(12)]
 
-finished = [False, False, False, False]
-
 def read_board():
 	line = [s for s in input().split(" ") if s != ""]
 	for j, s in enumerate(line):
@@ -235,176 +233,86 @@ def bottom_most(j):
 def or_zero(n):
 	return n if (n != "__" and n != -1) else 0
 
-def recurse(i=0, j=0):
-	if j == 7:
-		if left_row_count[i] != 4:
+def partial_solve(start_i, end_i, start_j, end_j):
+	finished = [False]
+
+	def is_board_invalid(i, j):
+		if j == 7:
+			if left_row_count[i] != 4:
+				return True
+			if outside_left[i] != "--":
+				if outside_left[i] > 7:
+					if 40 - outside_left[i] != or_zero(board[i][5]) + or_zero(board[i][6]):
+						return True
+				else:
+					if left_most(i) != outside_left[i]:
+						return True
+		if i == 6 and j > 1:
+			if top_column_count[j-1] != 4:
+				return True
+			if outside_top[j-1] != "--":
+				if outside_top[j-1] > 7:
+					if 40 - outside_top[j-1] != or_zero(board[5][j-1]) + or_zero(board[6][j-1]):
+						return True
+				else:
+					if top_most(j-1) != outside_top[j-1]:
+						return True
+		if j == 12:
+			if right_row_count[i] != 4:
+				return True
+			if outside_right[i] != "--":
+				if right_most(i) != outside_right[i]:
+					return True
+		if i == 11 and j > 1:
+			if bottom_column_count[j-1] != 4:
+				return True
+			if outside_bottom[j-1] != "--":
+				if bottom_most(j-1) != outside_bottom[j-1]:
+					return True
+		return False
+	
+	def reached_end_of_board(i, j):
+		return i == 12 and j == 7
+
+	def recurse(i=start_i, j=start_j):
+		if is_board_invalid(i, j):
 			return
-		if outside_left[i] != "--":
-			if outside_left[i] > 7:
-				if 40 - outside_left[i] != or_zero(board[i][5]) + or_zero(board[i][6]):
-					return
+		if j == end_j:
+			j = start_j
+			i += 1
+		if i == end_i:
+			if reached_end_of_board(i, j):
+				if is_board_connected():
+					print("FINAL SOLUTION")
+					print_board()
+					print("")
+					finished[0] = True
+				else:
+					print("unconnected solution")
+					print("")
 			else:
-				if left_most(i) != outside_left[i]:
-					return
-	if i == 6 and j > 1:
-		if top_column_count[j-1] != 4:
+				print("PARTIAL SOLUTION")
+				print_board()
+				print("")
+				finished[0] = True
 			return
-		if outside_top[j-1] != "--":
-			if outside_top[j-1] > 7:
-				if 40 - outside_top[j-1] != or_zero(board[5][j-1]) + or_zero(board[6][j-1]):
-					return
-			else:
-				if top_most(j-1) != outside_top[j-1]:
-					return
-	if j == 7:
-		j = 0
-		i += 1
-	if i == 7:
-		print("SOLUTION")
-		print_board()
-		print("")
-		finished[0] = True
-		return
-	if board[i][j] == "__":
-		board[i][j] = -1
-		recurse(i, j+1)
-		board[i][j] = "__"
-		for n in range(7+1):
-			if valid(i, j, n):
-				place(i, j, n)
-				recurse(i, j+1)
-				if finished[0]:
-					return
-				remove(i, j, n)
-	elif board[i][j] == -1:
-		recurse(i, j+1)
-	else:
-		if valid_static(i, j):
+		if board[i][j] == "__":
+			board[i][j] = -1
 			recurse(i, j+1)
-
-def recurse2(i=0, j=7):
-	if j == 12:
-		if right_row_count[i] != 4:
-			return
-		if outside_right[i] != "--":
-			if right_most(i) != outside_right[i]:
-				return
-	if i == 6 and j > 1:
-		if top_column_count[j-1] != 4:
-			return
-		if outside_top[j-1] != "--":
-			if outside_top[j-1] > 7:
-				if 40 - outside_top[j-1] != or_zero(board[5][j-1]) + or_zero(board[6][j-1]):
-					return
-			else:
-				if top_most(j-1) != outside_top[j-1]:
-					return
-	if j == 12:
-		j = 7
-		i += 1
-	if i == 7:
-		print("SOLUTION 2")
-		print_board()
-		print("")
-		finished[1] = True
-		return
-	if board[i][j] == "__":
-		recurse2(i, j+1)
-		for n in range(7+1):
-			if valid(i, j, n):
-				place(i, j, n)
-				recurse2(i, j+1)
-				if finished[1]:
-					return
-				remove(i, j, n)
-	elif board[i][j] == -1:
-		recurse2(i, j+1)
-	else:
-		if valid_static(i, j):
-			recurse2(i, j+1)
-
-def recurse3(i=7, j=0):
-	if j == 7:
-		if left_row_count[i] != 4:
-			return
-		if outside_left[i] != "--":
-			if outside_left[i] > 7:
-				if 40 - outside_left[i] != or_zero(board[i][5]) + or_zero(board[i][6]):
-					return
-			else:
-				if left_most(i) != outside_left[i]:
-					return
-	if i == 11 and j > 1:
-		if bottom_column_count[j-1] != 4:
-			return
-		if outside_bottom[j-1] != "--":
-			if bottom_most(j-1) != outside_bottom[j-1]:
-				return
-	if j == 7:
-		j = 0
-		i += 1
-	if i == 12:
-		print("SOLUTION 3")
-		print_board()
-		print("")
-		finished[2] = True
-		return
-	if board[i][j] == "__":
-		board[i][j] = -1
-		recurse3(i, j+1)
-		board[i][j] = "__"
-		for n in range(7+1):
-			if valid(i, j, n):
-				place(i, j, n)
-				recurse3(i, j+1)
-				if finished[2]:
-					return
-				remove(i, j, n)
-	elif board[i][j] == -1:
-		recurse3(i, j+1)
-	else:
-		if valid_static(i, j):
-			recurse3(i, j+1)
-
-def recurse4(i=7, j=7):
-	if j == 12:
-		if right_row_count[i] != 4:
-			return
-		if outside_right[i] != "--":
-			if right_most(i) != outside_right[i]:
-				return
-	if i == 11 and j > 1:
-		if bottom_column_count[j-1] != 4:
-			return
-		if outside_bottom[j-1] != "--":
-			if bottom_most(j-1) != outside_bottom[j-1]:
-				return
-	if j == 12:
-		j = 7
-		i += 1
-	if i == 12:
-		if is_board_connected():
-			print("SOLUTION 4")
-			print_board()
-			print("")
-			finished[3] = True
+			board[i][j] = "__"
+			for n in range(7+1):
+				if valid(i, j, n):
+					place(i, j, n)
+					recurse(i, j+1)
+					if finished[0]:
+						return
+					remove(i, j, n)
+		elif board[i][j] == -1:
+			recurse(i, j+1)
 		else:
-			print("SOLUTION 4 (not connected)")
-		return
-	if board[i][j] == "__":
-		recurse4(i, j+1)
-		for n in range(7+1):
-			if valid(i, j, n):
-				place(i, j, n)
-				recurse4(i, j+1)
-				if finished[3]:
-					return
-				remove(i, j, n)
-	elif board[i][j] == -1:
-		recurse4(i, j+1)
-	else:
-		if valid_static(i, j):
-			recurse4(i, j+1)
+			if valid_static(i, j):
+				recurse(i, j+1)
+	recurse()
 
 def count_non_zero():
 	result = 0
@@ -469,10 +377,10 @@ def product_of_areas():
 
 def solve():
 	read_board()
-	recurse()
-	recurse2()
-	recurse3()
-	recurse4()
+	partial_solve(0, 7, 0, 7)
+	partial_solve(0, 7, 7, 12)
+	partial_solve(7, 12, 0, 7)
+	partial_solve(7, 12, 7, 12)
 	print(f"product of orthogonally adjacent areas = {product_of_areas()}")
 
 solve()
