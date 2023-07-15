@@ -24,7 +24,7 @@ For all values of $x < c$, the robot will sprint another time. What will be the 
 
 We can separate this function in 3 regions:
 
-For $x < c$:
+For $x < c$:  
 $$
 \begin{aligned}
 p_{\text{sprint 1}}(X_0 + S = x) &= \int_0^xU(S = x - x_0)p_{\text{sprint 0}}(X_0 = x_0) \,dx_0\\\
@@ -32,7 +32,7 @@ p_{\text{sprint 1}}(X_0 + S = x) &= \int_0^xU(S = x - x_0)p_{\text{sprint 0}}(X_
 \end{aligned}
 $$
 
-For $c < x < 1$:
+For $c < x < 1$:  
 $$
 \begin{aligned}
 p_{\text{sprint 1}}(X_0 + S = x) &= \int_0^cU(S = x - x_0)p_{\text{sprint 0}}(X_0 = x_0) \,dx_0\\\
@@ -40,7 +40,7 @@ p_{\text{sprint 1}}(X_0 + S = x) &= \int_0^cU(S = x - x_0)p_{\text{sprint 0}}(X_
 \end{aligned}
 $$
 
-For $1 < x$:
+For $1 < x$:  
 $$
 \begin{aligned}
 p_{\text{sprint 1}}(X_0 + S = x) &= \int_{x-1}^cU(S = x - x_0)p_{\text{sprint 0}}(X_0 = x_0) \,dx_0\\\
