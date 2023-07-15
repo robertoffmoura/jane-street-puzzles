@@ -1,10 +1,10 @@
 Each robot will have a strategy where they'll decide to sprint if their current position $x$ is smaller than a cutoff point (let's say $c$) or jump otherwise.
 
 $$
-action(x) = 
+\text{action}(x) = 
 \begin{cases} 
-	sprint & x < c \\
-	jump   & x > c \\
+	\text{sprint} & x < c \\
+	\text{jump}   & x > c \\
 \end{cases}
 $$
 
@@ -14,10 +14,10 @@ To solve this problem, we'll first find the probability that the first robot win
 
 As the robot starts at $x = 0$, it makes no sense to jump in the first move because it will always get a better score by sprinting first, since it's impossible to cross the limit line on the first sprint.
 
-Let's say that $p_{sprint\_0}(x)$ is the probability density function (pdf) of the position of the robot after the first sprint. Since the robot will sprint a number uniformly distributed in $[0,1]$, we have
+Let's say that $p_{\text{sprint\_0}}(x)$ is the probability density function (pdf) of the position of the robot after the first sprint. Since the robot will sprint a number uniformly distributed in $[0,1]$, we have
 
 $$
-p_{sprint\_0}(x) = 1 \quad \textrm{ for } x \in [0,1]
+p_{\text{sprint\_0}}(x) = 1 \quad \textrm{ for } x \in [0,1]
 $$
 
 For all values of $x < c$, the robot will sprint another time. What will be the pdf of the position of the robot after the second sprint? We just need to calculate the probability $p(X_0 + S = x)$, where $S$ is the uniform number in $[0,1]$ drawn for the second sprint, and $X_0$ is the position after the first sprint (but only values smaller than $c$, otherwise the robot wouldn't be sprinting a second time).
@@ -27,7 +27,7 @@ We can separate this function in 3 regions:
 For $x < c$:
 $$
 \begin{aligned}
-p_{sprint\_1}(X_0 + S = x) &= \int_0^xU(S = x - x_0)p_{sprint\_0}(X_0 = x_0) \,dx_0\\\
+p_{\text{sprint\_1}}(X_0 + S = x) &= \int_0^xU(S = x - x_0)p_{\text{sprint\_0}}(X_0 = x_0) \,dx_0\\\
 &= \int_0^x 1 \,dx_0\ = x
 \end{aligned}
 $$
@@ -35,7 +35,7 @@ $$
 For $c < x < 1$:
 $$
 \begin{aligned}
-p_{sprint\_1}(X_0 + S = x) &= \int_0^cU(S = x - x_0)p_{sprint\_0}(X_0 = x_0) \,dx_0\\\
+p_{\text{sprint\_1}}(X_0 + S = x) &= \int_0^cU(S = x - x_0)p_{\text{sprint\_0}}(X_0 = x_0) \,dx_0\\\
 &= \int_0^c 1 \,dx_0\ = c
 \end{aligned}
 $$
@@ -43,7 +43,7 @@ $$
 For $1 < x$:
 $$
 \begin{aligned}
-p_{sprint\_1}(X_0 + S = x) &= \int_{x-1}^cU(S = x - x_0)p_{sprint\_0}(X_0 = x_0) \,dx_0\\\
+p_{\text{sprint\_1}}(X_0 + S = x) &= \int_{x-1}^cU(S = x - x_0)p_{\text{sprint\_0}}(X_0 = x_0) \,dx_0\\\
 &= \int_{x-1}^c 1 \,dx_0\ = c + 1 - x
 \end{aligned}
 $$
@@ -53,7 +53,7 @@ In the third region, the lower limit of the integral is $x-1$ because we have th
 The pdf of the position of the robot after sprinting twice is:
 
 $$
-p_{sprint\_1}(x) = 
+p_{\text{sprint\_1}}(x) = 
 \begin{cases} 
 	x & 0 < x < c \\
 	c & c < x < 1 \\
@@ -63,10 +63,10 @@ $$
 
 Or, in other words, a nice trapezoid.
 
-To find $p_{sprint\_(n+1)}(x)$, the pdf after the $(n+1)$-th sprint, we just need to do the same thing: find the pdf of the sum of two variables $X_n$ and $S$, where $X_n$ is drawn from $p_{sprint\_n}(x)$ and is smaller than $c$, and $S$ is drawn uniformly from $[0,1]$. If we keep doing that we'll find that the pdf after the $n$-th sprint is:
+To find $p_{\text{sprint\_(n+1)}}(x)$, the pdf after the $(n+1)$-th sprint, we just need to do the same thing: find the pdf of the sum of two variables $X_n$ and $S$, where $X_n$ is drawn from $p_{\text{sprint\_n}}(x)$ and is smaller than $c$, and $S$ is drawn uniformly from $[0,1]$. If we keep doing that we'll find that the pdf after the $n$-th sprint is:
 
 $$
-p_{sprint\_n}(x) = 
+p_{\text{sprint\_n}}(x) = 
 \begin{cases} 
 	x^n/n! & 0 < x < c \\
 	c^n/n! & c < x < 1 \\
@@ -76,11 +76,11 @@ $$
 
 Very nice. If you don't believe me, try proving this by induction. 
 
-You may have noticed that for each $p_{sprint\_n}(x)$ some values are greater than $1$, even though the robot never jumped. These correspond to the times where the robot sprinted past the limit, and so the score for these will be zero. If we sum these values of $x \in [1, 1+c]$ for each $n$, we'll get the distribution of positions that correspond to a failed attemp:
+You may have noticed that for each $p_{\text{sprint\_n}}(x)$ some values are greater than $1$, even though the robot never jumped. These correspond to the times where the robot sprinted past the limit, and so the score for these will be zero. If we sum these values of $x \in [1, 1+c]$ for each $n$, we'll get the distribution of positions that correspond to a failed attemp:
 
 $$
 \begin{aligned}
-p_{fail}(x) &= \sum_{n=0}^\infty \frac{c^n - (x - 1)^n}{n!}\\
+p_{\text{fail}}(x) &= \sum_{n=0}^\infty \frac{c^n - (x - 1)^n}{n!}\\
 &= e^c - e^{x-1}
 \end{aligned}
 $$
@@ -89,7 +89,7 @@ If we integrate that, we'll find the probability that the robot will sprint past
 
 $$
 \begin{aligned}
-p_{fail} &= \int_1^{1+c} e^c - e^{x-1} \,dx\\\
+p_{\text{fail}} &= \int_1^{1+c} e^c - e^{x-1} \,dx\\\
 &= 1 - (1-c)e^c
 \end{aligned}
 $$
@@ -98,16 +98,16 @@ Ok! Now what about the pdf of the position of the robot right before jumping? We
 
 $$
 \begin{aligned}
-p_{before\_jump}(x) &= \sum_{n=0}^\infty p_{sprint\_n}(x) \quad, x \in [c, 1]\\
+p_{\text{before\_jump}}(x) &= \sum_{n=0}^\infty p_{\text{sprint\_n}}(x) \quad, x \in [c, 1]\\
 &= \sum_{n=0}^\infty \frac{c^n}{n!}\\
 &= e^c
 \end{aligned}
 $$
 
-To find the pdf after the jump, we just need to find the distribution of the sum of two random variables, $X_{before\_jump} \sim p_{before\_jump}(x)$ and the jump $J \sim U(0, 1)$. This gives us:
+To find the pdf after the jump, we just need to find the distribution of the sum of two random variables, $X_{\text{before\_jump}} \sim p_{\text{before\_jump}}(x)$ and the jump $J \sim U(0, 1)$. This gives us:
 
 $$
-p_{after\_jump}(x) = 
+p_{\text{after\_jump}}(x) = 
 \begin{cases} 
 	(x-c)e^c & x \in [c,1] \\
 	(1-c)e^c & x \in [1,1+c] \\
@@ -129,21 +129,21 @@ We can express this in this equation:
 
 $$
 \begin{aligned}
-P_{win} &= P_{x_1 > x_2} + P_{2\_fails\_and\_1\_jumps} + P_{both\_fail}P_{win}\\
-P_{win} &= \frac{P_{x_1 > x_2} + P_{2\_fails\_and\_1\_jumps}}{(1 - P_{both\_fail})}\\
+P_{\text{win}} &= P_{x_1 > x_2} + P_{\text{2\_fails\_and\_1\_jumps}} + P_{\text{both\_fail}}P_{\text{win}}\\
+P_{\text{win}} &= \frac{P_{x_1 > x_2} + P_{\text{2\_fails\_and\_1\_jumps}}}{(1 - P_{\text{both\_fail}})}\\
 \end{aligned}
 $$
 
 If we denote the first and the second robot's cutoff by $c_1$ and $c_2$, the probability that both robots sprint over the limit will be:
 
 $$
-P_{both\_fail} = (1 - (1-c_1)e^{c_1})(1 - (1-c_2)e^{c_2})
+P_{\text{both\_fail}} = (1 - (1-c_1)e^{c_1})(1 - (1-c_2)e^{c_2})
 $$
 
 And the probability that the second robot fails and the first one doesn't will be:
 
 $$
-P_{2\_fails\_and\_1\_jumps} = (1-c_1)e^{c_1}(1 - (1-c_2)e^{c_2})
+P_{\text{2\_fails\_and\_1\_jumps}} = (1-c_1)e^{c_1}(1 - (1-c_2)e^{c_2})
 $$
 
 Now comes a hard part of the problem. To calculate the probability that robot 1 jumps farther than robot 2 we'll need to calculate a double integral everywhere $x_2$ is smaller than $x_1$:
@@ -152,7 +152,7 @@ $$
 P_{x_1 > x_2} = \int_{-\infty}^\infty \left( \int_{-\infty}^{x_1} p_2(x_2) \,dx_2\ \right) p_1(x_1) \,dx_1\ 
 $$
 
-(For the sake of simplicity, we're denoting $p_{after\_jump}(x)$ by $p(x)$). The computation of this integral can be divided into 5 different regions. Let's suppose $c_1$ is smaller $c_2$. If it's not, we can just switch $c_1$ and $c_2$ later.
+(For the sake of simplicity, we're denoting $p_{\text{after\_jump}}(x)$ by $p(x)$). The computation of this integral can be divided into 5 different regions. Let's suppose $c_1$ is smaller $c_2$. If it's not, we can just switch $c_1$ and $c_2$ later.
 
 To help visualize, see the 5 regions in the picture  
 ![Trapezoids](trapezoids.jpg)
@@ -212,9 +212,9 @@ If we now sum all of these functions we get... an exponential multiplied by a po
 
 Given the chosen cutoff $c_2$ for robot 2, If there's a cutoff $c_1$ that maximizes the probability of robot 1 winning, then robot 1 will choose that $c_1$. Robot 2 can always set $c_2 = c_1$ so that his probability of winning is at least $\frac{1}{2}$. After a few iterations of this we'll hopefully converge to a cutoff value where every other value has a probability smaller than $0.5$ of winning against it. Both robots will set their cutoff to this value and their probability of winning will be $0.5$.
 
-The first thing that comes to mind when thinking about finding the value of $c_1$ that maximizes $P_{win}$ is taking the derivative with respect to $c_1$ and setting it equal to zero. However, the expression for $P_{win}$ is such an enormously gigantic colossal monstrosity that we'd exhaust all the tress in the Amazon rainforest by trying to solve this on paper. For environmental reasons I'll leave the fun task of maximing $P_{win}$ for my computer.
+The first thing that comes to mind when thinking about finding the value of $c_1$ that maximizes $P_{\text{win}}$ is taking the derivative with respect to $c_1$ and setting it equal to zero. However, the expression for $P_{\text{win}}$ is such an enormously gigantic colossal monstrosity that we'd exhaust all the tress in the Amazon rainforest by trying to solve this on paper. For environmental reasons I'll leave the fun task of maximing $P_{\text{win}}$ for my computer.
 
-First we gotta define $P_{win}$. In Python we can do:
+First we gotta define $P_{\text{win}}$. In Python we can do:
 ```
 import math
 
@@ -251,9 +251,9 @@ def p_1_win(c1, c2):
 	return (a + b)/(1-c)
 ```
 
-Notice that we made the assumption that $c_1$ is smaller than $c_2$ when calculating the expression for $P_{win}$. That's not a problem since the probability that robot 1 wins is just one minus the probability that robot 2 wins, so we can simply switch $c_1$ and $c_2$ if $c_1$ happens to be larger than $c_2$.
+Notice that we made the assumption that $c_1$ is smaller than $c_2$ when calculating the expression for $P_{\text{win}}$. That's not a problem since the probability that robot 1 wins is just one minus the probability that robot 2 wins, so we can simply switch $c_1$ and $c_2$ if $c_1$ happens to be larger than $c_2$.
 
-We can plot $P_{win}$ for a few values of $c_1$ and $c_2$ to get an idea of what it looks like:
+We can plot $P_{\text{win}}$ for a few values of $c_1$ and $c_2$ to get an idea of what it looks like:
 ```
 import matplotlib.pyplot as plt
 
@@ -269,11 +269,11 @@ for j in range(m):
     plt.show()
 ```
 
-For example, here's what $P_{win}$ looks for a few different values of $c_1$ when $c_2 = 0.5$:
+For example, here's what $P_{\text{win}}$ looks for a few different values of $c_1$ when $c_2 = 0.5$:
 
 ![graph of the probability that robot 1 wins as function of $c_1$ when $c_2$ equals 0.5 ](c2-0.5.png)
 
-Here's a program that finds the $c_1$ which maximizes $P_{win}$ for a given $c_2$, and then sets $c_2 = c_1$ for a total of 10 iterations 
+Here's a program that finds the $c_1$ which maximizes $P_{\text{win}}$ for a given $c_2$, and then sets $c_2 = c_1$ for a total of 10 iterations 
 
 ```
 def best_c1_against(c2, start=0, end=1):
@@ -351,7 +351,7 @@ def decimal_get_neighbourhood(x, dec_places, n=10):
     dx = Decimal(1)/Decimal(10**dec_places)
     return [x - Decimal(n)*dx + dx*Decimal(i) for i in range(2*n)]
 ```
-Now if we continue searching for the $c$ that maximizes $P_{win}$ like we were doing before, we quickly find this:
+Now if we continue searching for the $c$ that maximizes $P_{\text{win}}$ like we were doing before, we quickly find this:
 ```
 c = Decimal(41619535486)/Decimal(100000000000)
 x = decimal_get_neighbourhood(c, 11, n=20)
