@@ -21,6 +21,7 @@ def redelmeier(n):
 			new_square = untried_set.pop()
 			if len(polyomino) == n-1:
 				count[0] += 1
+				print_polyomino(polyomino + [new_square])
 				continue
 			new_neighbors = get_neighbors(new_square)
 			new_untried_set = untried_set.copy()
@@ -35,5 +36,19 @@ def redelmeier(n):
 
 	redelmeier_recursion(untried_set)
 	return count[0]
+
+def print_polyomino(l):
+	min_x, min_y = float("inf"), float("inf")
+	max_x, max_y = float("-inf"), float("-inf")
+	for x, y in l:
+		min_x = min(min_x, x)
+		min_y = min(min_y, y)
+		max_x = max(max_x, x)
+		max_y = max(max_y, y)
+	result = [["  " for x in range(min_x, max_x+1)] for y in range(min_y, max_y+1)]
+	for x,y in l:
+		result[max_y - (y - min_y)][x - min_x] = "🟩"
+	print("\n".join(["".join(row) for row in result]))
+	print("")
 
 print(redelmeier(int(input())))
