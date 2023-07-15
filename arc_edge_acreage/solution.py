@@ -54,6 +54,23 @@ def solution(m, n):
 				return False
 		return True
 	
+	def is_simple_closed_curve(polyomino):
+		# Returns true if the polyomino has no holes.
+
+		# How many times each vertex appears.
+		vertex_count = {}
+		for x, y in polyomino:
+			for vx, vy in [(0,0), (1,0), (0,1), (1,1)]:
+				vertex = x + vx, y + vy
+				if vertex not in vertex_count:
+					vertex_count[vertex] = 0
+				vertex_count[vertex] += 1
+		interior_points = sum([1 for vertex,c in vertex_count.items() if c == 4])
+		boundary_points = sum([1 for vertex,c in vertex_count.items() if c in [1,2,3]])
+		# Prick's theorem
+		holes = n + 1 - interior_points - boundary_points//2
+		return holes == 0
+	
 	def get_positions():
 		# if the diagonally bounding rectangle of a polyomino is smaller than the grid,
 		# it can be placed in multiple positions. For example, a (2, 3) rectangle fits 
@@ -68,6 +85,9 @@ def solution(m, n):
 				continue
 			if len(polyomino) == n - 1:
 				polyomino.append(new_square)
+				if not is_simple_closed_curve(polyomino):
+					polyomino.pop()
+					continue
 				count[0] += 1
 				positions = get_positions()
 				p = get_perimeter(polyomino)
@@ -99,8 +119,8 @@ def solution(m, n):
 	answer = 0
 	for perimeter, c in perimeter_count.items():
 		answer += c * math.comb(perimeter, perimeter//2)
-	print("answer", answer)
-	return count[0]
+	print("answer:", answer)
+	return
 
 def print_polyomino(l):
 	min_x, min_y = float("inf"), float("inf")
@@ -125,4 +145,4 @@ def get_perimeter(polyomino):
 
 m = 7
 n = 16
-print(solution(m, n))
+solution(m, n)
