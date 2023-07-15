@@ -14,10 +14,10 @@ To solve this problem, we'll first find the probability that the first robot win
 
 As the robot starts at $x = 0$, it makes no sense to jump in the first move because it will always get a better score by sprinting first, since it's impossible to cross the limit line on the first sprint.
 
-Let's say that $p_{\text{sprint\_0}}(x)$ is the probability density function (pdf) of the position of the robot after the first sprint. Since the robot will sprint a number uniformly distributed in $[0,1]$, we have
+Let's say that $p_{\text{sprint 0}}(x)$ is the probability density function (pdf) of the position of the robot after the first sprint. Since the robot will sprint a number uniformly distributed in $[0,1]$, we have
 
 $$
-p_{\text{sprint\_0}}(x) = 1 \quad \textrm{ for } x \in [0,1]
+p_{\text{sprint 0}}(x) = 1 \quad \textrm{ for } x \in [0,1]
 $$
 
 For all values of $x < c$, the robot will sprint another time. What will be the pdf of the position of the robot after the second sprint? We just need to calculate the probability $p(X_0 + S = x)$, where $S$ is the uniform number in $[0,1]$ drawn for the second sprint, and $X_0$ is the position after the first sprint (but only values smaller than $c$, otherwise the robot wouldn't be sprinting a second time).
@@ -27,7 +27,7 @@ We can separate this function in 3 regions:
 For $x < c$:
 $$
 \begin{aligned}
-p_{\text{sprint\_1}}(X_0 + S = x) &= \int_0^xU(S = x - x_0)p_{\text{sprint\_0}}(X_0 = x_0) \,dx_0\\\
+p_{\text{sprint 1}}(X_0 + S = x) &= \int_0^xU(S = x - x_0)p_{\text{sprint 0}}(X_0 = x_0) \,dx_0\\\
 &= \int_0^x 1 \,dx_0\ = x
 \end{aligned}
 $$
@@ -35,7 +35,7 @@ $$
 For $c < x < 1$:
 $$
 \begin{aligned}
-p_{\text{sprint\_1}}(X_0 + S = x) &= \int_0^cU(S = x - x_0)p_{\text{sprint\_0}}(X_0 = x_0) \,dx_0\\\
+p_{\text{sprint 1}}(X_0 + S = x) &= \int_0^cU(S = x - x_0)p_{\text{sprint 0}}(X_0 = x_0) \,dx_0\\\
 &= \int_0^c 1 \,dx_0\ = c
 \end{aligned}
 $$
@@ -43,7 +43,7 @@ $$
 For $1 < x$:
 $$
 \begin{aligned}
-p_{\text{sprint\_1}}(X_0 + S = x) &= \int_{x-1}^cU(S = x - x_0)p_{\text{sprint\_0}}(X_0 = x_0) \,dx_0\\\
+p_{\text{sprint 1}}(X_0 + S = x) &= \int_{x-1}^cU(S = x - x_0)p_{\text{sprint 0}}(X_0 = x_0) \,dx_0\\\
 &= \int_{x-1}^c 1 \,dx_0\ = c + 1 - x
 \end{aligned}
 $$
@@ -53,7 +53,7 @@ In the third region, the lower limit of the integral is $x-1$ because we have th
 The pdf of the position of the robot after sprinting twice is:
 
 $$
-p_{\text{sprint\_1}}(x) = 
+p_{\text{sprint 1}}(x) = 
 \begin{cases} 
 	x & 0 < x < c \\
 	c & c < x < 1 \\
@@ -63,10 +63,10 @@ $$
 
 Or, in other words, a nice trapezoid.
 
-To find $p_{\text{sprint\_(n+1)}}(x)$, the pdf after the $(n+1)$-th sprint, we just need to do the same thing: find the pdf of the sum of two variables $X_n$ and $S$, where $X_n$ is drawn from $p_{\text{sprint\_n}}(x)$ and is smaller than $c$, and $S$ is drawn uniformly from $[0,1]$. If we keep doing that we'll find that the pdf after the $n$-th sprint is:
+To find $p_{\text{sprint (n+1)}}(x)$, the pdf after the $(n+1)$-th sprint, we just need to do the same thing: find the pdf of the sum of two variables $X_n$ and $S$, where $X_n$ is drawn from $p_{\text{sprint n}}(x)$ and is smaller than $c$, and $S$ is drawn uniformly from $[0,1]$. If we keep doing that we'll find that the pdf after the $n$-th sprint is:
 
 $$
-p_{\text{sprint\_n}}(x) = 
+p_{\text{sprint n}}(x) = 
 \begin{cases} 
 	x^n/n! & 0 < x < c \\
 	c^n/n! & c < x < 1 \\
@@ -76,7 +76,7 @@ $$
 
 Very nice. If you don't believe me, try proving this by induction. 
 
-You may have noticed that for each $p_{\text{sprint\_n}}(x)$ some values are greater than $1$, even though the robot never jumped. These correspond to the times where the robot sprinted past the limit, and so the score for these will be zero. If we sum these values of $x \in [1, 1+c]$ for each $n$, we'll get the distribution of positions that correspond to a failed attemp:
+You may have noticed that for each $p_{\text{sprint n}}(x)$ some values are greater than $1$, even though the robot never jumped. These correspond to the times where the robot sprinted past the limit, and so the score for these will be zero. If we sum these values of $x \in [1, 1+c]$ for each $n$, we'll get the distribution of positions that correspond to a failed attemp:
 
 $$
 \begin{aligned}
@@ -98,16 +98,16 @@ Ok! Now what about the pdf of the position of the robot right before jumping? We
 
 $$
 \begin{aligned}
-p_{\text{before\_jump}}(x) &= \sum_{n=0}^\infty p_{\text{sprint\_n}}(x) \quad, x \in [c, 1]\\
+p_{\text{before jump}}(x) &= \sum_{n=0}^\infty p_{\text{sprint n}}(x) \quad, x \in [c, 1]\\
 &= \sum_{n=0}^\infty \frac{c^n}{n!}\\
 &= e^c
 \end{aligned}
 $$
 
-To find the pdf after the jump, we just need to find the distribution of the sum of two random variables, $X_{\text{before\_jump}} \sim p_{\text{before\_jump}}(x)$ and the jump $J \sim U(0, 1)$. This gives us:
+To find the pdf after the jump, we just need to find the distribution of the sum of two random variables, $X_{\text{before jump}} \sim p_{\text{before jump}}(x)$ and the jump $J \sim U(0, 1)$. This gives us:
 
 $$
-p_{\text{after\_jump}}(x) = 
+p_{\text{after jump}}(x) = 
 \begin{cases} 
 	(x-c)e^c & x \in [c,1] \\
 	(1-c)e^c & x \in [1,1+c] \\
@@ -129,21 +129,21 @@ We can express this in this equation:
 
 $$
 \begin{aligned}
-P_{\text{win}} &= P_{x_1 > x_2} + P_{\text{2\_fails\_and\_1\_jumps}} + P_{\text{both\_fail}}P_{\text{win}}\\
-P_{\text{win}} &= \frac{P_{x_1 > x_2} + P_{\text{2\_fails\_and\_1\_jumps}}}{(1 - P_{\text{both\_fail}})}\\
+P_{\text{win}} &= P_{x_1 > x_2} + P_{\text{2 fails and 1 jumps}} + P_{\text{both fail}}P_{\text{win}}\\
+P_{\text{win}} &= \frac{P_{x_1 > x_2} + P_{\text{2 fails and 1 jumps}}}{(1 - P_{\text{both fail}})}\\
 \end{aligned}
 $$
 
 If we denote the first and the second robot's cutoff by $c_1$ and $c_2$, the probability that both robots sprint over the limit will be:
 
 $$
-P_{\text{both\_fail}} = (1 - (1-c_1)e^{c_1})(1 - (1-c_2)e^{c_2})
+P_{\text{both fail}} = (1 - (1-c_1)e^{c_1})(1 - (1-c_2)e^{c_2})
 $$
 
 And the probability that the second robot fails and the first one doesn't will be:
 
 $$
-P_{\text{2\_fails\_and\_1\_jumps}} = (1-c_1)e^{c_1}(1 - (1-c_2)e^{c_2})
+P_{\text{2 fails and 1 jumps}} = (1-c_1)e^{c_1}(1 - (1-c_2)e^{c_2})
 $$
 
 Now comes a hard part of the problem. To calculate the probability that robot 1 jumps farther than robot 2 we'll need to calculate a double integral everywhere $x_2$ is smaller than $x_1$:
@@ -152,7 +152,7 @@ $$
 P_{x_1 > x_2} = \int_{-\infty}^\infty \left( \int_{-\infty}^{x_1} p_2(x_2) \,dx_2\ \right) p_1(x_1) \,dx_1\ 
 $$
 
-(For the sake of simplicity, we're denoting $p_{\text{after\_jump}}(x)$ by $p(x)$). The computation of this integral can be divided into 5 different regions. Let's suppose $c_1$ is smaller $c_2$. If it's not, we can just switch $c_1$ and $c_2$ later.
+(For the sake of simplicity, we're denoting $p_{\text{after jump}}(x)$ by $p(x)$). The computation of this integral can be divided into 5 different regions. Let's suppose $c_1$ is smaller $c_2$. If it's not, we can just switch $c_1$ and $c_2$ later.
 
 To help visualize, see the 5 regions in the picture  
 ![Trapezoids](trapezoids.jpg)
