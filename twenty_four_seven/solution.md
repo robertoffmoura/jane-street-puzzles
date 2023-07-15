@@ -86,3 +86,5 @@ left_most_stack = [[12] for i in range(12)]
 ```
 `top_most_stack[j][-1]` is the top of the `j`-th stack and contains the index of the element which has the highest position in the `j`-th column. We start by initializing all column stacks with a single element of value 12 (the index of the lowest position in a column in 11, so 12 means there are no elements in this column). As we read the starting values for the board and as we update the board during our recursion we'll also update the stack. The stack allows us to perform the three operations of appending, popping and peeking the top element all in constant `O(1)` time. This will be useful for making our `is_board_valid()` function efficient.
 
+## Checking if the current board is valid
+
