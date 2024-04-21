@@ -10,6 +10,6 @@ y2 = np.random.rand(n)
 r = np.sqrt((x1 - x2)**2 + (y1 - y2)**2)/2
 xc = (x1 + x2)/2
 yc = (y1 + y2)/2
-inside = (xc + r > 1) | (xc - r < 0) | (yc + r > 1) | (yc - r < 0) 
-print(inside.mean())
+outside = (xc + r > 1) | (xc - r < 0) | (yc + r > 1) | (yc - r < 0) 
+print(outside.mean())
 print(1 - math.pi / 6)
