@@ -55,9 +55,16 @@ void recurse(int i, int& print_count) {
 
 	int valid_neighbors[max_neighbors];
 	int valid_count = get_valid_neighbors(i, valid_neighbors);
-	if (valid_count > 0) {
-		std::uniform_int_distribution<int> dist(0, valid_count - 1);
-		recurse(valid_neighbors[dist(rng)], print_count);
+
+	if (current_size > 40) {
+		for (int j = 0; j < valid_count; ++j) {
+			recurse(valid_neighbors[j], print_count);
+		}
+	} else {
+		if (valid_count > 0) {
+			std::uniform_int_distribution<int> dist(0, valid_count - 1);
+			recurse(valid_neighbors[dist(rng)], print_count);
+		}
 	}
 
 	--current_size;
