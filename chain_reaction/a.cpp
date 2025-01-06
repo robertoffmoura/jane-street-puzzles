@@ -1,94 +1,87 @@
 #include <iostream>
-#include <vector>
 #include <unordered_set>
-#include <stdlib.h>
+#include <random>
 
 const int n = 100;
-const int iterations = 1e6;
+const int iterations = 1e8;
+const int max_neighbors = 100;
 
-std::vector<int> neighbors[n + 1];
+int neighbors[n + 1][max_neighbors];
+int neighbor_count[n + 1] = {0};
 
-void delete_last_lines(int n) {
-	// Move the cursor to the start of the last line to be deleted
-	std::cout << "\x1b[" << n << "F";
-	// Clear each of the last n lines
-	for (int i = 0; i < n; ++i) {
-		std::cout << "\x1b[2K";
-	}
-	// Move the cursor back to the beginning of the line
-	std::cout << "\r" << std::flush;
-}
+int best[n + 1] = {0};
+int best_size = 0;
 
-std::vector<int> best;
-std::vector<int> current;
+int current[n + 1] = {0};
+int current_size = 0;
+
 std::unordered_set<int> seen;
+std::mt19937 rng(std::random_device{}());
 
-void print_vector(std::vector<int>& v) {
-	for (int k : v) {
-		std::cout << k << " ";
+inline void print_array(const int* arr, int size) {
+	for (int i = 0; i < size; ++i) {
+		std::cout << arr[i] << " ";
 	}
-	std::cout << std::endl;
+	std::cout << "\n";
 }
 
-std::vector<int> get_valid_neighbors(int i) {
-	std::vector<int> result;
-	for (int j : neighbors[i]) {
-		if (seen.find(j) != seen.end()) {
-			continue;
+inline int get_valid_neighbors(int i, int* result) {
+	int count = 0;
+	for (int j = 0; j < neighbor_count[i]; ++j) {
+		int neighbor = neighbors[i][j];
+		if (seen.count(neighbor) == 0) {
+			result[count++] = neighbor;
 		}
-		result.push_back(j);
 	}
-	return result;
+	return count;
 }
 
 void recurse(int i, int& print_count) {
 	seen.insert(i);
-	current.push_back(i);
+	current[current_size++] = i;
 
-	if (print_count == 100000) {
-		delete_last_lines(3);
-		print_vector(current);
-		print_vector(best);
-		std::cout << "best length: " << best.size() << std::endl;;
+	if (++print_count == 100000) {
 		print_count = 0;
+		std::cout << "\x1b[3F\x1b[2K";
+		print_array(current, current_size);
+		print_array(best, best_size);
+		std::cout << "best length: " << best_size << "\n";
 	}
-	++print_count;
 
-	if (current.size() > best.size()) {
-		best = current;
+	if (current_size > best_size) {
+		best_size = current_size;
+		std::copy(current, current + current_size, best);
 	}
-	std::vector<int> valid_neighbors = get_valid_neighbors(i);
-	int size = valid_neighbors.size();
-	if (size > 0) {
-		int index = rand() % size;
-		recurse(valid_neighbors[index], print_count);
+
+	int valid_neighbors[max_neighbors];
+	int valid_count = get_valid_neighbors(i, valid_neighbors);
+	if (valid_count > 0) {
+		std::uniform_int_distribution<int> dist(0, valid_count - 1);
+		recurse(valid_neighbors[dist(rng)], print_count);
 	}
-	current.pop_back();
+
+	--current_size;
 	seen.erase(i);
 }
 
-std::vector<int> solve() {
+void solve() {
 	int print_count = 0;
-	for (int i = 1; i < iterations; ++i) {
-		recurse(rand() % (n+1), print_count);
+	for (int i = 0; i < iterations; ++i) {
+		recurse(rng() % (n + 1), print_count);
 	}
-	return best;
 }
 
 int main() {
 	for (int i = 1; i <= n; ++i) {
-		for (int j = i+1; j <= n; ++j) {
-			if (j % i != 0) {
-				continue;
-			}
-			neighbors[i].push_back(j);
-			neighbors[j].push_back(i);
+		for (int j = i + i; j <= n; j += i) {
+			neighbors[i][neighbor_count[i]++] = j;
+			neighbors[j][neighbor_count[j]++] = i;
 		}
 	}
 
 	std::cout << "\n\n";
-	std::vector<int> result = solve();
-	print_vector(result);
+	solve();
+	print_array(best, best_size);
 
 	return 0;
 }
