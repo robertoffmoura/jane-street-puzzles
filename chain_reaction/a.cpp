@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <stdlib.h>
 
 const int n = 100;
+const int iterations = 1e6;
 
 std::vector<int> neighbors[n + 1];
 
@@ -28,10 +30,18 @@ void print_vector(std::vector<int>& v) {
 	std::cout << std::endl;
 }
 
-void recurse(int i, int& print_count) {
-	if (seen.find(i) != seen.end()) {
-		return;
+std::vector<int> get_valid_neighbors(int i) {
+	std::vector<int> result;
+	for (int j : neighbors[i]) {
+		if (seen.find(j) != seen.end()) {
+			continue;
+		}
+		result.push_back(j);
 	}
+	return result;
+}
+
+void recurse(int i, int& print_count) {
 	seen.insert(i);
 	current.push_back(i);
 
@@ -47,8 +57,11 @@ void recurse(int i, int& print_count) {
 	if (current.size() > best.size()) {
 		best = current;
 	}
-	for (int j : neighbors[i]) {
-		recurse(j, print_count);
+	std::vector<int> valid_neighbors = get_valid_neighbors(i);
+	int size = valid_neighbors.size();
+	if (size > 0) {
+		int index = rand() % size;
+		recurse(valid_neighbors[index], print_count);
 	}
 	current.pop_back();
 	seen.erase(i);
@@ -56,9 +69,8 @@ void recurse(int i, int& print_count) {
 
 std::vector<int> solve() {
 	int print_count = 0;
-	for (int i = 1; i <= n; ++i) {
-		std::cout << "i is " << i << std::endl;
-		recurse(i, print_count);
+	for (int i = 1; i < iterations; ++i) {
+		recurse(rand() % (n+1), print_count);
 	}
 	return best;
 }
