@@ -21,6 +21,13 @@ std::vector<int> best;
 std::vector<int> current;
 std::unordered_set<int> seen;
 
+void print_vector(std::vector<int>& v) {
+	for (int k : v) {
+		std::cout << k << " ";
+	}
+	std::cout << std::endl;
+}
+
 void recurse(int i, int& print_count) {
 	if (seen.find(i) != seen.end()) {
 		return;
@@ -29,15 +36,10 @@ void recurse(int i, int& print_count) {
 	current.push_back(i);
 
 	if (print_count == 100000) {
-		delete_last_lines(2);
-		for (int k : current) {
-			std::cout << k << " ";
-		}
-		std::cout << std::endl;
-		for (int k : best) {
-			std::cout << k << " ";
-		}
-		std::cout << std::endl;
+		delete_last_lines(3);
+		print_vector(current);
+		print_vector(best);
+		std::cout << "best length: " << best.size() << std::endl;;
 		print_count = 0;
 	}
 	++print_count;
@@ -63,8 +65,8 @@ std::vector<int> solve() {
 
 int main() {
 	for (int i = 1; i <= n; ++i) {
-		for (int j = 1; j <= n; ++j) {
-			if (i == j || i % j != 0) {
+		for (int j = i+1; j <= n; ++j) {
+			if (j % i != 0) {
 				continue;
 			}
 			neighbors[i].push_back(j);
@@ -74,10 +76,7 @@ int main() {
 
 	std::cout << "\n\n";
 	std::vector<int> result = solve();
-	for (int i = 0; i < result.size(); ++i) {
-		std::cout << result[i] << " ";
-	}
-	std::cout << std::endl;
+	print_vector(result);
 
 	return 0;
 }
