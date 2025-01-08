@@ -114,8 +114,30 @@ void backtrack(int top = 0, int bottom = n - 1, int left = 0, int right = n - 1,
 	}
 }
 
+void getLargestProduct(int j, int *seen, int current, int &answer) {
+	if (j == n) {
+		answer = std::max(answer, current);
+		return;
+	}
+	if (current == 0) {
+		return;
+	}
+	for (int i = 0; i < n; i++) {
+		if (seen[i]) {
+			continue;
+		}
+		seen[i] = true;
+		getLargestProduct(j+1, seen, current * solution[i][j], answer);
+		seen[i] = false;
+	}
+}
+
 int main() {
 	backtrack();
 	printSolution();
 	std::cout << "solution_count: " << solution_count << std::endl;
+	int seen[n] = {0};
+	int answer = 0;
+	getLargestProduct(0, seen, 1, answer);
+	std::cout << "answer: " << answer << std::endl;
 }
