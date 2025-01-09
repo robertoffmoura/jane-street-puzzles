@@ -82,11 +82,11 @@ void printBoard() {
 	std::cout << "\033[" << (n+4) << "A";
 }
 
-void addToBoard(int i, int j, int value) {
+inline void addToBoard(int i, int j, int value) {
 	board[i][j] = value;
 }
 
-void removeFromBoard(int i, int j) {
+inline void removeFromBoard(int i, int j) {
 	board[i][j] = 0;
 }
 
@@ -98,14 +98,16 @@ void saveSolution() {
 	}
 }
 
-int getLineProduct(std::function<int(int)> getElement) {
-	int product = 1;
+int getIncompleteNumbersInLine(int* numbers, std::function<int(int)> getElement) {
+	// Gets concatenated numbers in the row or column specified by getElement.
+	// Considers incomplete numbers as well, i.e, numbers that touch the middle (unvisited) region.
+	int count = 1;
 	int current = 0;
 	for (int k = 0; k < n; k++) {
 		int value = getElement(k);
 		if (value == 0 || value == -1) {
 			if (current > 0) {
-				product *= current;
+				numbers[count++] = current;
 				current = 0;
 			}
 		} else {
@@ -113,13 +115,15 @@ int getLineProduct(std::function<int(int)> getElement) {
 		}
 	}
 	if (current > 0) {
-		product *= current;
+		numbers[count++] = current;
 	}
-	return product;
+	return count;
 }
 
-int getLineProduct2(std::function<int(int)> getElement) {
-	int product = 1;
+int getCompleteNumbersInLine(int* numbers, std::function<int(int)> getElement) {
+	// Gets concatenated numbers in the row or column specified by getElement.
+	// Ignores incomplete numbers, i.e, numbers that touch the middle (unvisited) region.
+	int count = 0;
 	int current = 0;
 	bool touching_middle = false;
 	for (int k = 0; k < n; k++) {
@@ -130,7 +134,7 @@ int getLineProduct2(std::function<int(int)> getElement) {
 		} else if (value == -1) {
 			touching_middle = false;
 			if (current > 0) {
-				product *= current;
+				numbers[count++] = current;
 				current = 0;
 			}
 		} else {
@@ -140,46 +144,51 @@ int getLineProduct2(std::function<int(int)> getElement) {
 		}
 	}
 	if (current > 0) {
-		product *= current;
+		numbers[count++] = current;
 	}
-	return product;
+	return count;
 }
 
-int getLineGcd(std::function<int(int)> getElement) {
+int getProduct(int* values, int count) {
+	int result = 1;
+	for (int k = 0; k < count; k++) {
+		result *= values[k];
+	}
+	return result;
+}
+
+int getGcd(int* values, int count) {
 	int gcd = 0;
-	int current = 0;
-	bool touching_middle = false;
-	for (int k = 0; k < n; k++) {
-		int value = getElement(k);
-		if (value == 0) {
-			current = 0;
-			touching_middle = true;
-			continue;
-		} else if (value == -1) {
-			touching_middle = false;
-			if (current > 0) {
-				gcd = gcd > 0 ? std::gcd(gcd, current) : current;
-				current = 0;
-			}
-		} else {
-			if (!touching_middle) {
-				current = 10 * current + value;
-			}
-		}
-	}
-	if (current > 0) {
-		gcd = gcd > 0 ? std::gcd(gcd, current) : current;
+	for (int k = 0; k < count; k++) {
+		gcd = gcd > 0 ? std::gcd(gcd, values[k]) : values[k];
 	}
 	return gcd;
 }
 
 bool isLinePartiallyOk(int product_constraint, int gcd_constraint, std::function<int(int)> getElement) {
-	if (product_constraint != 0 && (getLineProduct(getElement) > product_constraint ||
-									product_constraint % getLineProduct2(getElement) != 0)) {
+	if (product_constraint == 0 && gcd_constraint == 0) {
+		return true;
+	}
+
+	int complete_numbers[n] = {};
+	int complete_numbers_count = getCompleteNumbersInLine(complete_numbers, getElement);
+
+	if (gcd_constraint != 0
+			&& getGcd(complete_numbers, complete_numbers_count) % gcd_constraint != 0) {
 		return false;
 	}
-	if (gcd_constraint != 0 && getLineGcd(getElement) % gcd_constraint != 0) {
-		return false;
+
+	if (product_constraint != 0) {
+		int complete_product = getProduct(complete_numbers, complete_numbers_count);
+		if (product_constraint % complete_product != 0) {
+			return false;
+		}
+		int incomplete_numbers[n] = {};
+		int incomplete_numbers_count = getIncompleteNumbersInLine(incomplete_numbers, getElement);
+		int incomplete_product = getProduct(incomplete_numbers, incomplete_numbers_count);
+		if (incomplete_product > product_constraint) {
+			return false;
+		}
 	}
 	return true;
 }
@@ -195,10 +204,19 @@ bool isColPartiallyOk(int j) {
 }
 
 bool isLineOk(int product_constraint, int gcd_constraint, std::function<int(int)> getElement) {
-	if (product_constraint != 0 && getLineProduct(getElement) != product_constraint) {
+	if (product_constraint == 0 && gcd_constraint == 0) {
+		return true;
+	}
+
+	int numbers[n] = {};
+	int numbers_count = getCompleteNumbersInLine(numbers, getElement);
+
+	if (product_constraint != 0
+			&& getProduct(numbers, numbers_count) != product_constraint) {
 		return false;
 	}
-	if (gcd_constraint != 0 && getLineGcd(getElement) != gcd_constraint) {
+	if (gcd_constraint != 0
+			&& getGcd(numbers, numbers_count) != gcd_constraint) {
 		return false;
 	}
 	return true;
@@ -241,7 +259,7 @@ bool hasUnfilledSquareInTwoByTwoRegion(int i, int j) {
 	return true;
 }
 
-bool isValid(int i, int j) {
+inline bool isValid(int i, int j) {
 	return 0 <= i && i < n && 0 <= j && j < n;
 }
 
@@ -365,7 +383,7 @@ void backtrack(RemainingRegion region = {0, n - 1, 0, n - 1},
 }
 
 int dfs(int i, int j, bool (&seen)[n][n]) {
-	if (!isValid(i, j) || solution[i][j] != -1 or seen[i][j]) {
+	if (!isValid(i, j) || solution[i][j] != -1 || seen[i][j]) {
 		return 0;
 	}
 	seen[i][j] = true;
