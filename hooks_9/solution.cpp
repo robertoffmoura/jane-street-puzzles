@@ -350,8 +350,8 @@ class Solver {
 					return;
 				}
 				if (seen_hooks_count == n) {
-					printBoard();
 					saveSolution();
+					printSolution();
 					std::cout << "SOLUTION!!!" << std::endl;
 					result_count += 1;
 					return;
@@ -368,10 +368,14 @@ class Solver {
 					}
 					seen_hooks[new_hook] = true;
 					seen_hooks_count += 1;
-					backtrack(top+1, bottom, left+1, right,  top, left,      top, bottom, left+1, right, new_hook, new_hook);
-					backtrack(top, bottom-1, left+1, right,  bottom, left,   top, bottom, left+1, right, new_hook, new_hook);
-					backtrack(top+1, bottom, left, right-1,  top, right,     top, bottom, left, right-1, new_hook, new_hook);
-					backtrack(top, bottom-1, left, right-1,  bottom, right,  top, bottom, left, right-1, new_hook, new_hook);
+					if (seen_hooks_count < n) {
+						backtrack(top+1, bottom, left+1, right,  top, left,      top, bottom, left+1, right, new_hook, new_hook);
+						backtrack(top, bottom-1, left+1, right,  bottom, left,   top, bottom, left+1, right, new_hook, new_hook);
+						backtrack(top+1, bottom, left, right-1,  top, right,     top, bottom, left, right-1, new_hook, new_hook);
+						backtrack(top, bottom-1, left, right-1,  bottom, right,  top, bottom, left, right-1, new_hook, new_hook);
+					} else {
+						backtrack(top+1, bottom, left+1, right,  top, left,      top, bottom, left+1, right, new_hook, new_hook);
+					}
 					seen_hooks_count -= 1;
 					seen_hooks[new_hook] = false;
 				}
